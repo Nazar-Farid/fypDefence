@@ -1,21 +1,21 @@
 'use client'
 
-import React, { useState } from 'react'
-import dynamic from 'next/dynamic'
-import { useFormContext } from 'react-hook-form'
 import { useAuthContextHook } from '@/context/use-auth-context'
+import React, { useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import TypeSelectionForm from './type-selection-form'
+import dynamic from 'next/dynamic'
 import { Spinner } from '@/components/spinner'
 
-// ✅ Wrap Spinner in an anonymous function to match the expected type
+// ✅ Fix: wrap Spinner in a function to avoid type error
 const DetailForm = dynamic(() => import('./account-details-form'), {
   ssr: false,
-  loading: () => <Spinner noPadding={true} />,
+  loading: () => <Spinner />,
 })
 
 const OTPForm = dynamic(() => import('./otp-form'), {
   ssr: false,
-  loading: () => <Spinner noPadding={true} />,
+  loading: () => <Spinner />,
 })
 
 type Props = {}
@@ -31,8 +31,10 @@ const RegistrationFormStep = (props: Props) => {
   const [onOTP, setOnOTP] = useState<string>('')
   const [onUserType, setOnUserType] = useState<'owner' | 'student'>('owner')
 
-  // ✅ Set OTP value in form
-  setValue('otp', onOTP)
+  // ✅ Move setValue into a useEffect to avoid calling it during every render
+  React.useEffect(() => {
+    setValue('otp', onOTP)
+  }, [onOTP, setValue])
 
   switch (currentStep) {
     case 1:
