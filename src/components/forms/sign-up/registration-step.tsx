@@ -1,19 +1,21 @@
 'use client'
-import { useAuthContextHook } from '@/context/use-auth-context'
+
 import React, { useState } from 'react'
-import { useFormContext } from 'react-hook-form'
-import TypeSelectionForm from './type-selection-form'
 import dynamic from 'next/dynamic'
+import { useFormContext } from 'react-hook-form'
+import { useAuthContextHook } from '@/context/use-auth-context'
+import TypeSelectionForm from './type-selection-form'
 import { Spinner } from '@/components/spinner'
 
+// ✅ Wrap Spinner in an anonymous function to match the expected type
 const DetailForm = dynamic(() => import('./account-details-form'), {
   ssr: false,
-  loading: Spinner,
+  loading: () => <Spinner noPadding={true} />,
 })
 
 const OTPForm = dynamic(() => import('./otp-form'), {
   ssr: false,
-  loading: Spinner,
+  loading: () => <Spinner noPadding={true} />,
 })
 
 type Props = {}
@@ -24,10 +26,12 @@ const RegistrationFormStep = (props: Props) => {
     formState: { errors },
     setValue,
   } = useFormContext()
+
   const { currentStep } = useAuthContextHook()
   const [onOTP, setOnOTP] = useState<string>('')
   const [onUserType, setOnUserType] = useState<'owner' | 'student'>('owner')
 
+  // ✅ Set OTP value in form
   setValue('otp', onOTP)
 
   switch (currentStep) {
@@ -53,9 +57,9 @@ const RegistrationFormStep = (props: Props) => {
           setOTP={setOnOTP}
         />
       )
+    default:
+      return <div>RegistrationFormStep</div>
   }
-
-  return <div>RegistrationFormStep</div>
 }
 
 export default RegistrationFormStep
